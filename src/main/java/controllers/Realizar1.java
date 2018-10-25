@@ -27,13 +27,15 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "Realizar", urlPatterns = {"/Realizar"})
 public class Realizar1 extends HttpServlet {
+
     public Conexion conex = new Conexion();
+
     @Override
     public void init() throws ServletException {
         super.init(); //To change body of generated methods, choose Tools | Templates.
         conex.iniciarPool();
     }
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -75,17 +77,19 @@ public class Realizar1 extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (request.getParameter("Aceptar").equals("Crear")) {
-
+            request.getRequestDispatcher("JSP/crear/inicioInsertar.jsp").forward(request, response);
         }
         if (request.getParameter("Aceptar").equals("Visualizar")) {
             request.setAttribute("lista", visualizarContenido());
             request.getRequestDispatcher("JSP/visualizar/leer.jsp").forward(request, response);
         }
         if (request.getParameter("Aceptar").equals("Modificar")) {
-
+            request.setAttribute("lista", visualizarContenido());
+            request.getRequestDispatcher("JSP/actualizar/inicioActualizar.jsp").forward(request, response);
         }
         if (request.getParameter("Aceptar").equals("Borrar")) {
-
+            request.setAttribute("lista", visualizarContenido());
+            request.getRequestDispatcher("JSP/borrar/leerEliminar.jsp").forward(request, response);
         }
         processRequest(request, response);
     }
@@ -103,7 +107,7 @@ public class Realizar1 extends HttpServlet {
     private ArrayList<Ave> visualizarContenido() {
         ArrayList<Ave> listado = new ArrayList<Ave>();
         try {
-            
+
             Connection con = conex.iniciarConexion();
             String sql = "select * from aves";
             Statement sentencia = con.createStatement();
@@ -117,13 +121,12 @@ public class Realizar1 extends HttpServlet {
                 ave.setFecha(resultado.getString("fecha"));
                 listado.add(ave);
             }
-
+            conex.cerrarConexion();
         } catch (SQLException ex) {
             System.out.println("Error SQL en el metodo visualizar");
             Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listado;
     }
-    
 
 }

@@ -12,6 +12,21 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        
+        <h1>Crear un ave</h1>
+        <form action="Operacion" method="POST">
+            <input type="hidden" value="Insertar" name="nombre">
+            Anilla:<br>
+            <input type="text" name="Anilla"><br>
+            Especie:<br>
+            <input type="text" name="Especie"><br>
+            Lugar:<br>
+            <input type="text" name="Lugar"><br>
+            Fecha:<br>
+            <input type="text" name="Fecha"><br>
+            <input type="submit" name="boton" value="Cancelar">
+            <input type="submit" name="boton" value="Aceptar">
+            
+        </form>
     </body>
 </html>

@@ -8,6 +8,6 @@
                name="jdbc/Pool" 
                password="2019" 
                type="javax.sql.DataSource" 
-               url="jdbc:mysql://localhost:3306/pruebasJAVA"
+               url="jdbc:mysql://localhost:3306/pruebasjava"
                username="java2019"/>
 </Context>

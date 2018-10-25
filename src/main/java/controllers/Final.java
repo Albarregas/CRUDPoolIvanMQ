@@ -60,6 +60,7 @@ public class Final extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.getRequestDispatcher("/index.html").forward(request, response);
         processRequest(request, response);
     }
 

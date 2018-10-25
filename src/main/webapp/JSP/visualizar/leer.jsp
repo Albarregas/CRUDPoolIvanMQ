@@ -17,16 +17,29 @@
         <h1>Pantalla Leer</h1>
         <table>
             <tr>
-        <%
-            ArrayList<Ave> lista=(ArrayList<Ave>)request.getAttribute("lista");
-            for (Ave elem : lista) {
-                    %><td><%=elem.getAnilla()%></td><%
-                    %><td><%=elem.getEspecie()%></td><%
-                    %><td><%=elem.getLugar()%></td><%
-                    %><td><%=elem.getFecha()%></td><%    
-                }
-        %>
+                <td style="border: 1px solid black">Anilla</td>
+                <td style="border: 1px solid black">Especie</td>
+                <td style="border: 1px solid black">Lugar</td>
+                <td style="border: 1px solid black"">Fecha</td>
             </tr>
-        </table>
-    </body>
+        <%
+
+            ArrayList<Ave> lista = (ArrayList<Ave>) request.getAttribute("lista");
+            for (Ave elem : lista) {
+        %><tr><%
+    %><td style="border: 1px solid black"><%=elem.getAnilla()%></td><%
+    %><td style="border: 1px solid black"><%=elem.getEspecie()%></td><%
+    %><td style="border: 1px solid black"><%=elem.getLugar()%></td><%
+    %><td style="border: 1px solid black"><%=elem.getFecha()%></td><%
+    %></tr><%
+        }
+
+
+    %>
+        
+</table>
+    <form method="post" action="Final">
+            <input type="submit" name="Principal" value="Principal"/>
+        </form>
+</body>
 </html>
