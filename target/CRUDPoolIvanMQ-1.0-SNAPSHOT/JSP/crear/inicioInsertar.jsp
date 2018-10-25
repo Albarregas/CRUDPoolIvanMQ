@@ -26,7 +26,6 @@
             <input type="text" name="Fecha"><br>
             <input type="submit" name="boton" value="Cancelar">
             <input type="submit" name="boton" value="Aceptar">
-            
         </form>
     </body>
 </html>

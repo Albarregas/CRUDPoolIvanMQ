@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -41,7 +42,9 @@ public class Operacion2 extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        String anillo=request.getParameter("valores");
+        request.setAttribute("listadoActualizar", obtenerDatos(anillo));
+        request.getRequestDispatcher("JSP/actualizar/Actualizar.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -56,7 +59,22 @@ public class Operacion2 extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        if (request.getParameter("nombre").equals("Borrar")) {
+            if (request.getParameter("boton").equals("Cancelar")) {
+                request.getRequestDispatcher("/index.html").forward(request, response);
+            } else if (request.getParameter("boton").equals("Aceptar")) {
+                String[] valores = request.getParameterValues("valores");
+                if (valores != null) {
+                    ArrayList<Ave> listadoBorrado = null;
+                    for (int i = 0; i < valores.length; i++) {
+                        listadoBorrado = obtenerDatos(valores[i]);
+                    }
+                    request.setAttribute("listadoBorrado", listadoBorrado);
+                    
+                    request.getRequestDispatcher("JSP/borrar/eliminar.jsp").forward(request, response);
+                }
+            }
+        }
     }
 
     /**
@@ -85,14 +103,16 @@ public class Operacion2 extends HttpServlet {
                         && ave.getLugar() != null
                         && ave.getFecha() != null) {
                     insertarDB(ave);
-                    request.setAttribute("Ave",ave);
+                    request.setAttribute("Ave", ave);
                     request.getRequestDispatcher("JSP/insertar/finInsertar.jsp").forward(request, response);
                 } else {
                     request.getRequestDispatcher("JSP/insertar/inicioInsertar.jsp").forward(request, response);
                 }
             }
         }
-        processRequest(request, response);
+        if (request.getParameter("nombre").equals("Actualizar")) {
+            processRequest(request, response);
+        }
 
     }
 
@@ -107,40 +127,67 @@ public class Operacion2 extends HttpServlet {
     }// </editor-fold>
 
     private void insertarDB(Ave ave) {
-        if(comprobar(ave.getAnilla())){
-          try {
-            Connection con = conex.iniciarConexion();
-            String sql= "INSERT INTO `aves` VALUES ('"
-                    +ave.getAnilla()+"','"
-                    +ave.getEspecie()+"','"
-                    +ave.getLugar()+"','"
-                    +ave.getFecha()+"')";
-            Statement sentencia = con.createStatement();
-            sentencia.executeQuery(sql);
-            conex.cerrarConexion();
-        } catch (SQLException ex) {
-            System.out.println("Error SQL en el metodo visualizar");
-            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
-        }  
+        if (comprobar(ave.getAnilla())) {
+            try {
+                Connection con = conex.iniciarConexion();
+                String sql = "INSERT INTO `aves` VALUES ('"
+                        + ave.getAnilla() + "','"
+                        + ave.getEspecie() + "','"
+                        + ave.getLugar() + "','"
+                        + ave.getFecha() + "')";
+                Statement sentencia = con.createStatement();
+                sentencia.executeQuery(sql);
+                conex.cerrarConexion();
+            } catch (SQLException ex) {
+                System.out.println("Error SQL en el metodo visualizar");
+                Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    private boolean comprobar(String anilla) { 
+    private boolean comprobar(String anilla) {
         try {
             Connection con = conex.iniciarConexion();
-            String sql = "select * from aves where anillas="+anilla;
+            String sql = "select * from aves where anillas=" + anilla;
             Statement sentencia = con.createStatement();
             ResultSet resultado = sentencia.executeQuery(sql);
-            if(resultado.next()){
+            if (resultado.next()) {
                 conex.cerrarConexion();
                 return true;
             }
-            
+
         } catch (SQLException ex) {
             System.out.println("Error SQL en el metodo visualizar");
             Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+
+
+
+    private ArrayList<Ave> obtenerDatos(String valor) {
+        ArrayList<Ave> listado = new ArrayList<Ave>();
+        try {
+
+            Connection con = conex.iniciarConexion();
+            String sql = "select * from aves where anilla="+valor;
+            Statement sentencia = con.createStatement();
+            ResultSet resultado = sentencia.executeQuery(sql);
+            Ave ave = null;
+            while (resultado.next()) {
+                ave = new Ave();
+                ave.setAnilla(resultado.getString("anilla"));
+                ave.setEspecie(resultado.getString("especie"));
+                ave.setLugar(resultado.getString("lugar"));
+                ave.setFecha(resultado.getString("fecha"));
+                listado.add(ave);
+            }
+            conex.cerrarConexion();
+        } catch (SQLException ex) {
+            System.out.println("Error SQL en el metodo visualizar");
+            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listado;
     }
 
 }

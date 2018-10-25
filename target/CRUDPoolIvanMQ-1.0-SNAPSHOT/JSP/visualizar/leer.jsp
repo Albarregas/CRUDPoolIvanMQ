@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Visualizar</title>
     </head>
     <body>
         <h1>Pantalla Leer</h1>
@@ -20,7 +20,7 @@
                 <td style="border: 1px solid black">Anilla</td>
                 <td style="border: 1px solid black">Especie</td>
                 <td style="border: 1px solid black">Lugar</td>
-                <td style="border: 1px solid black"">Fecha</td>
+                <td style="border: 1px solid black">Fecha</td>
             </tr>
         <%
 
