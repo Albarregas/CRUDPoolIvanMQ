@@ -10,6 +10,7 @@ import connection.Conexion;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,7 +28,13 @@ import javax.servlet.http.HttpServletResponse;
  * @author Iván
  */
 @WebServlet(name = "Operacion", urlPatterns = {"/Operacion"})
-public class Operacion2 extends HttpServlet {
+public class Operacion extends HttpServlet {
+
+    @Override
+    public void init() throws ServletException {
+        super.init(); //To change body of generated methods, choose Tools | Templates.
+        conex.iniciarPool();
+    }
 
     public Conexion conex = new Conexion();
 
@@ -42,7 +49,7 @@ public class Operacion2 extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String anillo=request.getParameter("valores");
+        String anillo = request.getParameter("valores");
         request.setAttribute("listadoActualizar", obtenerDatos(anillo));
         request.getRequestDispatcher("JSP/actualizar/Actualizar.jsp").forward(request, response);
     }
@@ -70,8 +77,11 @@ public class Operacion2 extends HttpServlet {
                         listadoBorrado = obtenerDatos(valores[i]);
                     }
                     request.setAttribute("listadoBorrado", listadoBorrado);
-                    
                     request.getRequestDispatcher("JSP/borrar/eliminar.jsp").forward(request, response);
+                }else{
+                    request.setAttribute("lista", visualizarContenido());
+                    request.setAttribute("error","Por favor seleccione algun campo");
+                    request.getRequestDispatcher("JSP/borrar/leerEliminar.jsp").forward(request, response);
                 }
             }
         }
@@ -98,15 +108,24 @@ public class Operacion2 extends HttpServlet {
             if (request.getParameter("boton").equals("Cancelar")) {
                 request.getRequestDispatcher("/index.html").forward(request, response);
             } else if (request.getParameter("boton").equals("Aceptar")) {
+                request.setAttribute("Ave", ave);
                 if (ave.getAnilla() != null
                         && ave.getEspecie() != null
                         && ave.getLugar() != null
                         && ave.getFecha() != null) {
-                    insertarDB(ave);
-                    request.setAttribute("Ave", ave);
-                    request.getRequestDispatcher("JSP/insertar/finInsertar.jsp").forward(request, response);
+                    if (noExiste(ave.getAnilla())) {
+                        insertarDB(ave);
+                        request.getRequestDispatcher("JSP/crear/finInsertar.jsp").forward(request, response);
+                    } else {
+                        request.setAttribute("error","Ya existe la anilla en la base de datos");
+                        
+                        request.getRequestDispatcher("JSP/crear/inicioInsertar.jsp").forward(request, response);
+                    }
+
                 } else {
-                    request.getRequestDispatcher("JSP/insertar/inicioInsertar.jsp").forward(request, response);
+                    request.setAttribute("lista", visualizarContenido());
+                    request.setAttribute("error","Por favor, rellene todos los campos para continuar");
+                    request.getRequestDispatcher("JSP/crear/inicioInsertar.jsp").forward(request, response);
                 }
             }
         }
@@ -127,50 +146,51 @@ public class Operacion2 extends HttpServlet {
     }// </editor-fold>
 
     private void insertarDB(Ave ave) {
-        if (comprobar(ave.getAnilla())) {
-            try {
-                Connection con = conex.iniciarConexion();
-                String sql = "INSERT INTO `aves` VALUES ('"
-                        + ave.getAnilla() + "','"
-                        + ave.getEspecie() + "','"
-                        + ave.getLugar() + "','"
-                        + ave.getFecha() + "')";
-                Statement sentencia = con.createStatement();
-                sentencia.executeQuery(sql);
-                conex.cerrarConexion();
-            } catch (SQLException ex) {
-                System.out.println("Error SQL en el metodo visualizar");
-                Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        String insertTableSQL = "INSERT INTO aves"
+                + "(anilla, especie, lugar, fecha) VALUES"
+                + "(?,?,?,?)";
+
+        try {
+
+            Connection con = conex.iniciarConexion();
+            PreparedStatement preparedStatement = con.prepareStatement(insertTableSQL);
+
+            preparedStatement.setString(1, ave.getAnilla());
+            preparedStatement.setString(2, ave.getEspecie());
+            preparedStatement.setString(3, ave.getLugar());
+            preparedStatement.setString(4, ave.getFecha());
+
+            // se ejecuta la sentencia
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private boolean comprobar(String anilla) {
+    private boolean noExiste(String anilla) {
         try {
             Connection con = conex.iniciarConexion();
-            String sql = "select * from aves where anillas=" + anilla;
+            String sql = "select * from aves where anilla = " + anilla;
             Statement sentencia = con.createStatement();
             ResultSet resultado = sentencia.executeQuery(sql);
             if (resultado.next()) {
                 conex.cerrarConexion();
-                return true;
+                return false;
             }
-
         } catch (SQLException ex) {
-            System.out.println("Error SQL en el metodo visualizar");
-            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+            conex.cerrarConexion();
+
         }
-        return false;
+        return true;
     }
-
-
 
     private ArrayList<Ave> obtenerDatos(String valor) {
         ArrayList<Ave> listado = new ArrayList<Ave>();
         try {
 
             Connection con = conex.iniciarConexion();
-            String sql = "select * from aves where anilla="+valor;
+            String sql = "select * from aves where anilla=" + valor;
             Statement sentencia = con.createStatement();
             ResultSet resultado = sentencia.executeQuery(sql);
             Ave ave = null;
@@ -189,5 +209,28 @@ public class Operacion2 extends HttpServlet {
         }
         return listado;
     }
+    private ArrayList<Ave> visualizarContenido() {
+        ArrayList<Ave> listado = new ArrayList<Ave>();
+        try {
 
+            Connection con = conex.iniciarConexion();
+            String sql = "select * from aves";
+            Statement sentencia = con.createStatement();
+            ResultSet resultado = sentencia.executeQuery(sql);
+            Ave ave = null;
+            while (resultado.next()) {
+                ave = new Ave();
+                ave.setAnilla(resultado.getString("anilla"));
+                ave.setEspecie(resultado.getString("especie"));
+                ave.setLugar(resultado.getString("lugar"));
+                ave.setFecha(resultado.getString("fecha"));
+                listado.add(ave);
+            }
+            conex.cerrarConexion();
+        } catch (SQLException ex) {
+            System.out.println("Error SQL en el metodo visualizar");
+            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listado;
+    }
 }

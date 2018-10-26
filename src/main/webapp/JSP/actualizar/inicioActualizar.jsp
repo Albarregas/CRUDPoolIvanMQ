@@ -15,6 +15,8 @@
     </head>
     <body>
         <h1>Hello World!</h1>
+        <%if(request.getAttribute("error")!=null)%>
+        <h3><%=request.getAttribute("error")%></h3>
         <form action="Operacion" method="GET">
             <input type="hidden" value="Borrar" name="nombre">
             <table>

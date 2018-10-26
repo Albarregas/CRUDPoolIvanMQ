@@ -15,7 +15,7 @@
     </head>
     <body>
         <h1>Pantalla Borrar</h1>
-        <h2>Estos son los que se borrraran. ¿Esta usted seguro?</h2>
+        <h2>Estos son los que se borraran. ¿Esta usted seguro?</h2>
         <table>
             <tr>
                 <td style="border: 1px solid black">Anilla</td>
@@ -26,6 +26,7 @@
         <%
 
             ArrayList<Ave> lista = (ArrayList<Ave>) request.getAttribute("listadoBorrado");
+            request.setAttribute("listadoBorrado", lista);
             for (Ave elem : lista) {
         %><tr><%
     %><td style="border: 1px solid black"><%=elem.getAnilla()%></td><%
@@ -37,8 +38,10 @@
     %>
         
 </table>
-    <form method="post" action="Final">
-            <input type="submit" name="Principal" value="Principal"/>
+    <form method="get" action="Concluir">
+        <input type="hidden" value="Eliminar" name="nombre">
+            <input type="submit" name="boton" value="Cancelar">
+            <input type="submit" name="boton" value="Confirmar">
         </form>
 </body>
 </html>

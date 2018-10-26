@@ -15,11 +15,15 @@
     </head>
     <body>
         <h1>Borrar ave</h1>
+        <%if (request.getAttribute("error") != null) {%>
+        <h3><%=request.getAttribute("error")%></h3>
+        <%}%>
         <form action="Operacion" method="GET">
             <input type="hidden" value="Borrar" name="nombre">
             <table>
                 <tr>
-                    <td style="border: 1px solid black">Anilla</td>
+                    <td>Selecciona una</td>
+                    <td></td>
                     <td style="border: 1px solid black">Especie</td>
                     <td style="border: 1px solid black">Lugar</td>
                     <td style="border: 1px solid black">Fecha</td>
@@ -28,14 +32,13 @@
 
                     ArrayList<Ave> lista = (ArrayList<Ave>) request.getAttribute("lista");
                     for (Ave elem : lista) {
-                %><tr><%
-                %><input type="checkbox" name="valores" value="<%=elem.getAnilla()%>"><%
-                %><td style="border: 1px solid black"><%=elem.getEspecie()%></td><%
-                %><td style="border: 1px solid black"><%=elem.getLugar()%></td><%
-                %><td style="border: 1px solid black"><%=elem.getFecha()%></td><%
-                %></tr><%
-                    }
-                %>
+                %><tr>
+                    <td><input type="checkbox" name="valores" value="<%=elem.getAnilla()%>"><td>
+                    <td style="border: 1px solid black"><%=elem.getEspecie()%></td>
+                    <td style="border: 1px solid black"><%=elem.getLugar()%></td>
+                    <td style="border: 1px solid black"><%=elem.getFecha()%></td>
+                </tr>
+                    <%}%>
             </table>
             <input type="submit" name="boton" value="Cancelar">
             <input type="submit" name="boton" value="Aceptar">
