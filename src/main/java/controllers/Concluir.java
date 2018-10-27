@@ -64,10 +64,20 @@ public class Concluir extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ArrayList<Ave> lista = (ArrayList<Ave>) request.getAttribute("listadoBorrado");
+
         if (request.getParameter("boton").equals("Confirmar")) {
-            request.setAttribute("listaBorrado", lista);
-            borrarBD(lista);
+            String[] valores = request.getParameterValues("valores");
+            ArrayList<Ave> listadoBorrar = null;
+            String prefix = "", con_comas = "";
+            for (int i = 0; i < valores.length; i++) {
+                con_comas += prefix + "'" + valores[i] + "'";
+                prefix = ",";
+            }
+            listadoBorrar = obtenerDatos(con_comas);
+            request.setAttribute("listadoBorrado", listadoBorrar);
+            borrarBD(con_comas);
+            request.getRequestDispatcher("JSP/borrar/finEliminar.jsp").forward(request, response);
+
         } else if (request.getParameter("boton").equals("Cancelar")) {
             request.setAttribute("lista", visualizarContenido());
             request.getRequestDispatcher("JSP/borrar/leerEliminar.jsp").forward(request, response);
@@ -85,7 +95,30 @@ public class Concluir extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        Ave ave = new Ave(
+                    request.getParameter("Anilla"),
+                    request.getParameter("Especie"),
+                    request.getParameter("Lugar"),
+                    request.getParameter("Fecha")
+            );
+        request.setAttribute("Ave", ave);
+        if (request.getParameter("boton").equals("Confirmar")) {
+            
+            if (!ave.getAnilla().equals("")
+                    && !ave.getEspecie().equals("")
+                    && !ave.getLugar().equals("")
+                    && !ave.getFecha().equals("")) {
+                actualizarDB(ave);
+                request.getRequestDispatcher("JSP/actualizar/finActualizar.jsp").forward(request, response);
 
+            }else{
+                request.setAttribute("error", "Por favor, no dejes campos en blanco.");
+                request.getRequestDispatcher("JSP/actualizar/Actualizar.jsp").forward(request, response);
+            }
+        } else {
+            request.setAttribute("lista", visualizarContenido());
+            request.getRequestDispatcher("JSP/actualizar/inicioActualizar.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -123,19 +156,62 @@ public class Concluir extends HttpServlet {
         return listado;
     }
 
-    private void borrarBD(ArrayList<Ave> lista) {
-        Connection con=conex.iniciarConexion();
-        String sql="DELETE FROM Tabla WHERE anilla=IN(";
-        for (int i = 0; i < lista.size(); i++) {
-            sql=sql+lista.get(i).getAnilla()+",";
-        }
-        //sql.replace(sql.length(), )
+    private void borrarBD(String valor) {
+        Connection con = conex.iniciarConexion();
+        String sql = "DELETE FROM aves WHERE anilla IN(";
+        sql = sql + valor + ")";
         try {
-            PreparedStatement stmt = con.prepareStatement(sql);
-            int x = stmt.executeUpdate();
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             Logger.getLogger(Concluir.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+    }
+
+    private ArrayList<Ave> obtenerDatos(String valor) {
+        ArrayList<Ave> listado = new ArrayList<Ave>();
+        try {
+
+            Connection con = conex.iniciarConexion();
+            String sql = "SELECT * FROM aves where anilla IN(";
+            sql = sql + valor + ")";
+            Statement sentencia = con.createStatement();
+            ResultSet resultado = sentencia.executeQuery(sql);
+            Ave ave = null;
+            while (resultado.next()) {
+                ave = new Ave();
+                ave.setAnilla(resultado.getString("anilla"));
+                ave.setEspecie(resultado.getString("especie"));
+                ave.setLugar(resultado.getString("lugar"));
+                ave.setFecha(resultado.getString("fecha"));
+                listado.add(ave);
+            }
+            conex.cerrarConexion();
+        } catch (SQLException ex) {
+            System.out.println("Error SQL en el metodo visualizar");
+            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listado;
+    }
+
+    private void actualizarDB(Ave ave) {
+        try {
+            String sql = "UPDATE aves SET "
+                    + "especie = ?"
+                    + ",lugar = ?"
+                    + ",fecha = ?"
+                    + "WHERE anilla=?";
+
+            Connection con = conex.iniciarConexion();
+            PreparedStatement pstm = con.prepareStatement(sql);
+            pstm.setString(1, ave.getEspecie());
+            pstm.setString(2, ave.getLugar());
+            pstm.setString(3, ave.getFecha());
+            pstm.setString(4, ave.getAnilla());
+
+            pstm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(Concluir.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

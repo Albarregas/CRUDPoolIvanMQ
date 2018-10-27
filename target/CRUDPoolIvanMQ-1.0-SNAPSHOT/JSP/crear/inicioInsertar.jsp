@@ -33,7 +33,20 @@
             <input type="text" name="Fecha" value="<%=ave.getFecha()%>"><br>
             <input type="submit" name="boton" value="Cancelar">
             <input type="submit" name="boton" value="Aceptar">
-         <%}%>          
+         <%}else{%>
+         <form action="Operacion" method="POST">
+            <input type="hidden" value="Insertar" name="nombre">
+            Anilla:<br>
+            <input type="text" name="Anilla" value=""><br>
+            Especie:<br>
+            <input type="text" name="Especie" value=""><br>
+            Lugar:<br>
+            <input type="text" name="Lugar" value=""><br>
+            Fecha:<br>
+            <input type="text" name="Fecha" value=""><br>
+            <input type="submit" name="boton" value="Cancelar">
+            <input type="submit" name="boton" value="Aceptar">
+<%}%>          
         </form>
     </body>
 </html>

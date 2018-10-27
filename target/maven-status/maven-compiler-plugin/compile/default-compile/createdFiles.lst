@@ -1,6 +1,8 @@
-controllers\Operacion2.class
 controllers\Concluir.class
 controllers\Final.class
 connection\Conexion.class
 controllers\Realizar1.class
+utils\MyLogger.class
 beans\Ave.class
+controllers\Operacion.class
+utils\UTF8Filter.class

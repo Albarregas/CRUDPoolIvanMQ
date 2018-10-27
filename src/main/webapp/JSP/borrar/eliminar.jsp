@@ -26,7 +26,7 @@
         <%
 
             ArrayList<Ave> lista = (ArrayList<Ave>) request.getAttribute("listadoBorrado");
-            request.setAttribute("listadoBorrado", lista);
+            
             for (Ave elem : lista) {
         %><tr><%
     %><td style="border: 1px solid black"><%=elem.getAnilla()%></td><%
@@ -35,10 +35,17 @@
     %><td style="border: 1px solid black"><%=elem.getFecha()%></td><%
     %></tr><%
         }
+
     %>
+            
+            
         
 </table>
     <form method="get" action="Concluir">
+        <%for (Ave elem : lista) {%>
+        <input type="hidden" value="<%=elem.getAnilla()%>" name="valores">
+        <%}%>
+        
         <input type="hidden" value="Eliminar" name="nombre">
             <input type="submit" name="boton" value="Cancelar">
             <input type="submit" name="boton" value="Confirmar">

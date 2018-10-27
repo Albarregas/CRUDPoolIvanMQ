@@ -49,9 +49,15 @@ public class Operacion extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String anillo = request.getParameter("valores");
-        request.setAttribute("listadoActualizar", obtenerDatos(anillo));
-        request.getRequestDispatcher("JSP/actualizar/Actualizar.jsp").forward(request, response);
+        if (request.getParameter("valores") != null) {
+            String anillo = request.getParameter("valores");
+            request.setAttribute("Ave", obtenerDatos(anillo).get(0));
+            request.getRequestDispatcher("JSP/actualizar/Actualizar.jsp").forward(request, response);
+        } else {
+            request.setAttribute("error", "Seleccione algun campo.");
+            request.getRequestDispatcher("JSP/actualizar/inicioActualizar.jsp").forward(request, response);
+        }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -73,14 +79,18 @@ public class Operacion extends HttpServlet {
                 String[] valores = request.getParameterValues("valores");
                 if (valores != null) {
                     ArrayList<Ave> listadoBorrado = null;
+                    String prefix = "", con_comas = "";
                     for (int i = 0; i < valores.length; i++) {
-                        listadoBorrado = obtenerDatos(valores[i]);
+                        con_comas += prefix + "'" + valores[i] + "'";
+                        prefix = ",";
                     }
+                    listadoBorrado = obtenerDatos(con_comas);
+
                     request.setAttribute("listadoBorrado", listadoBorrado);
                     request.getRequestDispatcher("JSP/borrar/eliminar.jsp").forward(request, response);
-                }else{
+                } else {
                     request.setAttribute("lista", visualizarContenido());
-                    request.setAttribute("error","Por favor seleccione algun campo");
+                    request.setAttribute("error", "Por favor seleccione algun campo");
                     request.getRequestDispatcher("JSP/borrar/leerEliminar.jsp").forward(request, response);
                 }
             }
@@ -98,6 +108,9 @@ public class Operacion extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (request.getParameter("boton").equals("Cancelar")) {
+            request.getRequestDispatcher("/index.html").forward(request, response);
+        }
         if (request.getParameter("nombre").equals("Insertar")) {
             Ave ave = new Ave(
                     request.getParameter("Anilla"),
@@ -105,30 +118,25 @@ public class Operacion extends HttpServlet {
                     request.getParameter("Lugar"),
                     request.getParameter("Fecha")
             );
-            if (request.getParameter("boton").equals("Cancelar")) {
-                request.getRequestDispatcher("/index.html").forward(request, response);
-            } else if (request.getParameter("boton").equals("Aceptar")) {
-                request.setAttribute("Ave", ave);
-                if (ave.getAnilla() != null
-                        && ave.getEspecie() != null
-                        && ave.getLugar() != null
-                        && ave.getFecha() != null) {
-                    if (noExiste(ave.getAnilla())) {
-                        insertarDB(ave);
-                        request.getRequestDispatcher("JSP/crear/finInsertar.jsp").forward(request, response);
-                    } else {
-                        request.setAttribute("error","Ya existe la anilla en la base de datos");
-                        
-                        request.getRequestDispatcher("JSP/crear/inicioInsertar.jsp").forward(request, response);
-                    }
-
+            request.setAttribute("Ave", ave);
+            if (!ave.getAnilla().equals("")
+                    && !ave.getEspecie().equals("")
+                    && !ave.getLugar().equals("")
+                    && !ave.getFecha().equals("")){
+                if (noExiste(ave.getAnilla())) {
+                    insertarDB(ave);
+                    request.getRequestDispatcher("JSP/crear/finInsertar.jsp").forward(request, response);
                 } else {
-                    request.setAttribute("lista", visualizarContenido());
-                    request.setAttribute("error","Por favor, rellene todos los campos para continuar");
+                    request.setAttribute("error", "Ya existe la anilla en la base de datos");
                     request.getRequestDispatcher("JSP/crear/inicioInsertar.jsp").forward(request, response);
                 }
+            } else {
+                request.setAttribute("lista", visualizarContenido());
+                request.setAttribute("error", "Por favor, rellene todos los campos para continuar");
+                request.getRequestDispatcher("JSP/crear/inicioInsertar.jsp").forward(request, response);
             }
         }
+        
         if (request.getParameter("nombre").equals("Actualizar")) {
             processRequest(request, response);
         }
@@ -190,7 +198,8 @@ public class Operacion extends HttpServlet {
         try {
 
             Connection con = conex.iniciarConexion();
-            String sql = "select * from aves where anilla=" + valor;
+            String sql = "select * from aves where anilla IN(";
+            sql = sql + valor + ")";
             Statement sentencia = con.createStatement();
             ResultSet resultado = sentencia.executeQuery(sql);
             Ave ave = null;
@@ -209,6 +218,7 @@ public class Operacion extends HttpServlet {
         }
         return listado;
     }
+
     private ArrayList<Ave> visualizarContenido() {
         ArrayList<Ave> listado = new ArrayList<Ave>();
         try {
