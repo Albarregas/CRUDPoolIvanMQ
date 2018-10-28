@@ -15,7 +15,7 @@
     </head>
     <body>
         <h1>Borrado</h1>
-        <h2>Estos son los datos borrados.</h2>
+        <h3>Estos son los datos borrados.</h3>
         <table>
             <tr>
                 <td style="border: 1px solid black">Anilla</td>

@@ -69,6 +69,7 @@ public class Concluir extends HttpServlet {
         String url = null;
         //Si pulsamos el boton Borrar entrara.
         if (request.getParameter("boton").equals("Borrar")) {
+            //Recogemos todos los valores que hayamos marcado
             String[] valores = request.getParameterValues("valores");
             ArrayList<Ave> listadoBorrar = null;
             //Utilizamos este metodo para meter todos los valores en una cadena separados por comas.
