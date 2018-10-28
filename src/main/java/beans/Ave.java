@@ -6,6 +6,7 @@
 package beans;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 
 /**
@@ -16,9 +17,9 @@ public class Ave implements Serializable{
     String anilla;
     String especie;
     String lugar;
-    String fecha;
+    Date fecha;
 
-    public Ave(String anilla, String especie, String lugar, String fecha) {
+    public Ave(String anilla, String especie, String lugar, Date fecha) {
         this.anilla = anilla;
         this.especie = especie;
         this.lugar = lugar;
@@ -58,11 +59,11 @@ public class Ave implements Serializable{
         this.lugar = lugar;
     }
 
-    public String getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
     

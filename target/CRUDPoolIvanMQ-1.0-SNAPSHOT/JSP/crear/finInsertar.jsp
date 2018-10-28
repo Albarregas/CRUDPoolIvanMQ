@@ -14,6 +14,7 @@
     </head>
     <body>
         <h1>Dato Insertado</h1>
+        <h3>Este es el dato insertado.</h3>
         <table>
             <tr>
                 <td style="border: 1px solid black">Anilla</td>

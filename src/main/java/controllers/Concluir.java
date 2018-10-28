@@ -10,6 +10,7 @@ import connection.Conexion;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,24 +65,30 @@ public class Concluir extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        if (request.getParameter("boton").equals("Confirmar")) {
+        //Esta cadena nos servira para redireccionar el flujo.
+        String url = null;
+        //Si pulsamos el boton Borrar entrara.
+        if (request.getParameter("boton").equals("Borrar")) {
             String[] valores = request.getParameterValues("valores");
             ArrayList<Ave> listadoBorrar = null;
+            //Utilizamos este metodo para meter todos los valores en una cadena separados por comas.
             String prefix = "", con_comas = "";
             for (int i = 0; i < valores.length; i++) {
                 con_comas += prefix + "'" + valores[i] + "'";
                 prefix = ",";
             }
+            //Guardamos los datos que quiere borrar el usuario y los dejamos en sesion para despues mostrarlos
             listadoBorrar = obtenerDatos(con_comas);
             request.setAttribute("listadoBorrado", listadoBorrar);
+            //LLamamos al metodo y lo borramos de la base de datos.
             borrarBD(con_comas);
-            request.getRequestDispatcher("JSP/borrar/finEliminar.jsp").forward(request, response);
+            url = "JSP/borrar/finEliminar.jsp";
 
         } else if (request.getParameter("boton").equals("Cancelar")) {
             request.setAttribute("lista", visualizarContenido());
-            request.getRequestDispatcher("JSP/borrar/leerEliminar.jsp").forward(request, response);
+            url = "JSP/borrar/leerEliminar.jsp";
         }
+        request.getRequestDispatcher(url).forward(request, response);
     }
 
     /**
@@ -93,32 +100,48 @@ public class Concluir extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
+    //Utilizo el metodo doPost para recoger el formulario actualizar
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Ave ave = new Ave(
-                    request.getParameter("Anilla"),
-                    request.getParameter("Especie"),
-                    request.getParameter("Lugar"),
-                    request.getParameter("Fecha")
-            );
-        request.setAttribute("Ave", ave);
-        if (request.getParameter("boton").equals("Confirmar")) {
-            
-            if (!ave.getAnilla().equals("")
-                    && !ave.getEspecie().equals("")
-                    && !ave.getLugar().equals("")
-                    && !ave.getFecha().equals("")) {
-                actualizarDB(ave);
-                request.getRequestDispatcher("JSP/actualizar/finActualizar.jsp").forward(request, response);
+        //Redireccionara el flujo
+        String url = null;
+        //Recogemos el ave del formulario
+        Ave ave = new Ave();
+        try {
+            ave.setAnilla(request.getParameter("Anilla"));
+            ave.setEspecie(request.getParameter("Especie"));
+            ave.setLugar(request.getParameter("Lugar"));
+            ave.setFecha(Date.valueOf(request.getParameter("Fecha")));
 
-            }else{
-                request.setAttribute("error", "Por favor, no dejes campos en blanco.");
-                request.getRequestDispatcher("JSP/actualizar/Actualizar.jsp").forward(request, response);
+            //Lo pasamos por sesion para que puedan leerlo en la pantalla final
+            request.setAttribute("Ave", ave);
+            //Si has pulsado el boton Actualizar entrara
+            if (request.getParameter("boton").equals("Actualizar")) {
+                //Comprobamos que los datos no esten vacios.
+                if (!ave.getAnilla().equals("")
+                        && !ave.getEspecie().equals("")
+                        && !ave.getLugar().equals("")
+                        && !ave.getFecha().equals("")) {
+                    //LLamamos al metodo para actualizar el ave.
+                    actualizarDB(ave);
+                    url = "JSP/actualizar/finActualizar.jsp";
+                } else {
+                    //Si estan vacios..
+                    request.setAttribute("error", "Por favor, no dejes campos en blanco.");
+                    url = "JSP/actualizar/Actualizar.jsp";
+                }
+            } else {
+                //Si pulsa el boton cancelar...
+                request.setAttribute("lista", visualizarContenido());
+                url = "JSP/actualizar/inicioActualizar.jsp";
             }
-        } else {
-            request.setAttribute("lista", visualizarContenido());
-            request.getRequestDispatcher("JSP/actualizar/inicioActualizar.jsp").forward(request, response);
+        } catch (IllegalArgumentException e) {
+            //Todo esto lo hago para controlar si borra una fecha el usuario y devolverle todos los datos que ya tenia.
+            request.setAttribute("error", "Por favor, no dejes la fecha en blanco.");
+            request.setAttribute("Ave", ave);
+            url = "JSP/actualizar/Actualizar.jsp";
         }
+        request.getRequestDispatcher(url).forward(request, response);
     }
 
     /**
@@ -130,6 +153,7 @@ public class Concluir extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+    //Este metodo sirve para sacar todo el contenido de la base de datos.
 
     private ArrayList<Ave> visualizarContenido() {
         ArrayList<Ave> listado = new ArrayList<Ave>();
@@ -145,29 +169,35 @@ public class Concluir extends HttpServlet {
                 ave.setAnilla(resultado.getString("anilla"));
                 ave.setEspecie(resultado.getString("especie"));
                 ave.setLugar(resultado.getString("lugar"));
-                ave.setFecha(resultado.getString("fecha"));
+                ave.setFecha(resultado.getDate("fecha"));
                 listado.add(ave);
             }
             conex.cerrarConexion();
         } catch (SQLException ex) {
             System.out.println("Error SQL en el metodo visualizar");
-            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Realizar.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listado;
     }
 
+    //Borra todos los datos de las claves que introduzcas por parametros
+    //para insertar varios datos en la string tienen que estar separados por comas ","
     private void borrarBD(String valor) {
-        Connection con = conex.iniciarConexion();
+
         String sql = "DELETE FROM aves WHERE anilla IN(";
-        sql = sql + valor + ")";
+        sql += valor + ")";
         try {
+            Connection con = conex.iniciarConexion();
             Statement stmt = con.createStatement();
             stmt.executeUpdate(sql);
+            conex.cerrarConexion();
         } catch (SQLException ex) {
             Logger.getLogger(Concluir.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    //Obtiene todos los datos de los que introduzcas por parametros en una string
+    //para insertar varios datos en la string tienen que estar separados por comas ","
     private ArrayList<Ave> obtenerDatos(String valor) {
         ArrayList<Ave> listado = new ArrayList<Ave>();
         try {
@@ -183,17 +213,18 @@ public class Concluir extends HttpServlet {
                 ave.setAnilla(resultado.getString("anilla"));
                 ave.setEspecie(resultado.getString("especie"));
                 ave.setLugar(resultado.getString("lugar"));
-                ave.setFecha(resultado.getString("fecha"));
+                ave.setFecha(resultado.getDate("fecha"));
                 listado.add(ave);
             }
             conex.cerrarConexion();
         } catch (SQLException ex) {
             System.out.println("Error SQL en el metodo visualizar");
-            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Realizar.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listado;
     }
 
+    //Este metodo actualiza el ave que se le pasa por parametro.
     private void actualizarDB(Ave ave) {
         try {
             String sql = "UPDATE aves SET "
@@ -206,10 +237,11 @@ public class Concluir extends HttpServlet {
             PreparedStatement pstm = con.prepareStatement(sql);
             pstm.setString(1, ave.getEspecie());
             pstm.setString(2, ave.getLugar());
-            pstm.setString(3, ave.getFecha());
+            pstm.setDate(3, ave.getFecha());
             pstm.setString(4, ave.getAnilla());
 
             pstm.executeUpdate();
+            conex.cerrarConexion();
         } catch (SQLException ex) {
             Logger.getLogger(Concluir.class.getName()).log(Level.SEVERE, null, ex);
         }

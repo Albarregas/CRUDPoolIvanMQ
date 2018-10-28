@@ -14,7 +14,7 @@
     </head>
     <body>
         <h1>Actualizado</h1>
-        <h3>Este es el ave actualizada</h3>
+        <h3>Este es el ave actualizada.</h3>
         <table>
             <tr>
                 <td style="border: 1px solid black">Anilla</td>

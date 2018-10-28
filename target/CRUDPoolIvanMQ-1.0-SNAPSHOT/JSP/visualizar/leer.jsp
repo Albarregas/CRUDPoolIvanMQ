@@ -14,7 +14,8 @@
         <title>Visualizar</title>
     </head>
     <body>
-        <h1>Pantalla Leer</h1>
+        <h1>Visualizar</h1>
+        <h3>Estas son todas las aves de la base de datos.</h3>
         <table>
             <tr>
                 <td style="border: 1px solid black">Anilla</td>

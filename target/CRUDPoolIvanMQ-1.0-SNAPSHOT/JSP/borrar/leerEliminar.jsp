@@ -11,12 +11,13 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Borrar ave</title>
+        <title>Borrar</title>
     </head>
     <body>
-        <h1>Borrar ave</h1>
+        <h1>Borrar</h1>
+        <h3>Seleccione cuales quiere borrar.</h3>
         <%if (request.getAttribute("error") != null) {%>
-        <h3><%=request.getAttribute("error")%></h3>
+        <h5 style="color: red"><%=request.getAttribute("error")%></h5>
         <%}%>
         <form action="Operacion" method="GET">
             <input type="hidden" value="Borrar" name="nombre">

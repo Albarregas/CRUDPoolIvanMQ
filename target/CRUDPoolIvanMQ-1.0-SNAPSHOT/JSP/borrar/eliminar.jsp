@@ -14,8 +14,8 @@
         <title>Borrar</title>
     </head>
     <body>
-        <h1>Pantalla Borrar</h1>
-        <h2>Estos son los que se borraran. ¿Esta usted seguro?</h2>
+        <h1>Borrando</h1>
+        <h3>Estos son los que se borraran. ¿Esta usted seguro?</h3>
         <table>
             <tr>
                 <td style="border: 1px solid black">Anilla</td>
@@ -48,7 +48,7 @@
         
         <input type="hidden" value="Eliminar" name="nombre">
             <input type="submit" name="boton" value="Cancelar">
-            <input type="submit" name="boton" value="Confirmar">
+            <input type="submit" name="boton" value="Borrar">
         </form>
 </body>
 </html>

@@ -11,10 +11,10 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Borrar</title>
     </head>
     <body>
-        <h1>Pantalla Borrar</h1>
+        <h1>Borrado</h1>
         <h2>Estos son los datos borrados.</h2>
         <table>
             <tr>
@@ -43,8 +43,7 @@
     <form method="POST" action="Final">
         <%%>
         <input type="hidden" value="Eliminar" name="nombre">
-            <input type="submit" name="boton" value="Cancelar">
-            <input type="submit" name="boton" value="Confirmar">
+            <input type="submit" name="boton" value="Principal">
         </form>
 </body>
 </html>

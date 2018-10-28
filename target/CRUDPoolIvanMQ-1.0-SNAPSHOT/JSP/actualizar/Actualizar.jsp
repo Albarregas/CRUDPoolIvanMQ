@@ -10,12 +10,13 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Actualizar</title>
     </head>
     <body>
         <h1>Actualizando</h1>
+        <h3>Rellene el campo que quiera actualizar.</h3>
         <%if (request.getAttribute("error") != null) {%>
-        <h3><%=request.getAttribute("error")%></h3>
+        <h5 style="color: red"><%=request.getAttribute("error")%></h5>
         <%}%>
         <%if (request.getAttribute("Ave") != null) {
                 Ave ave = (Ave) request.getAttribute("Ave");
@@ -29,9 +30,9 @@
             Lugar:<br>
             <input type="text" name="Lugar" value="<%=ave.getLugar()%>"><br>
             Fecha:<br>
-            <input type="text" name="Fecha" value="<%=ave.getFecha()%>"><br>
+            <input type="date" name="Fecha" value="<%=ave.getFecha()%>"><br>
             <input type="submit" name="boton" value="Cancelar">
-            <input type="submit" name="boton" value="Confirmar">
+            <input type="submit" name="boton" value="Actualizar">
 
             <%}%> 
 </body>

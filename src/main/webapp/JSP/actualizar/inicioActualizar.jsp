@@ -11,12 +11,13 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Actualizar</title>
     </head>
     <body>
         <h1>Actualizacion</h1>
+        <h3>Seleccione cual quiere actualizar.</h3>
         <%if(request.getAttribute("error")!=null){%>
-        <h3><%=request.getAttribute("error")%></h3>
+        <h5 style="color: red"><%=request.getAttribute("error")%></h5>
         <%}%>
         <form action="Operacion" method="POST">
             <input type="hidden" value="Actualizar" name="nombre">
@@ -28,7 +29,6 @@
                     <td style="border: 1px solid black">Fecha</td>
                 </tr>
                 <%
-
                     ArrayList<Ave> lista = (ArrayList<Ave>) request.getAttribute("lista");
                     for (Ave elem : lista) {
                 %><tr>

@@ -10,13 +10,14 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Insertar</title>
     </head>
     <body>
         
-        <h1>Crear un ave</h1>
+        <h1>Insertar</h1>
+        <h3>Rellene los campos con los que se creara el ave.</h3>
         <%if(request.getAttribute("error")!=null){%>
-        <h3><%=request.getAttribute("error")%></h3>
+        <h5 style="color: red"><%=request.getAttribute("error")%></h5>
         <%}%>
         <%if(request.getAttribute("Ave")!=null){
             Ave ave=(Ave)request.getAttribute("Ave");
@@ -30,7 +31,7 @@
             Lugar:<br>
             <input type="text" name="Lugar" value="<%=ave.getLugar()%>"><br>
             Fecha:<br>
-            <input type="text" name="Fecha" value="<%=ave.getFecha()%>"><br>
+            <input type="date" name="Fecha" value="<%=ave.getFecha()%>"><br>
             <input type="submit" name="boton" value="Cancelar">
             <input type="submit" name="boton" value="Aceptar">
          <%}else{%>
@@ -43,7 +44,7 @@
             Lugar:<br>
             <input type="text" name="Lugar" value=""><br>
             Fecha:<br>
-            <input type="text" name="Fecha" value=""><br>
+            <input type="date" name="Fecha" value=""><br>
             <input type="submit" name="boton" value="Cancelar">
             <input type="submit" name="boton" value="Aceptar">
 <%}%>          

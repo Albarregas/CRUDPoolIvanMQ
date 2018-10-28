@@ -23,7 +23,7 @@ public class Conexion {
     DataSource datasource=null;
     Connection con = null;
 
-   
+   //Este metodo inicia un pool de conexiones y se usa en el metodo init de cada controlador para no crear mas que uno.
    public void iniciarPool(){
         try {
             Context contextoInicial = new InitialContext();
@@ -33,7 +33,7 @@ public class Conexion {
             ex.printStackTrace();
         }
     }
-
+   //Este metodo inicia una conexion y la retorna para usarla.
     public Connection iniciarConexion(){   
         try {
             con = datasource.getConnection();
@@ -42,6 +42,7 @@ public class Conexion {
         }
         return con;
     }
+    //este metodo cierra la conexion abierta.
     public void cerrarConexion(){
         try {
             con.close();

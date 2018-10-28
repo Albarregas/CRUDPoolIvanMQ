@@ -9,6 +9,7 @@ import beans.Ave;
 import connection.Conexion;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Iván
  */
 @WebServlet(name = "Realizar", urlPatterns = {"/Realizar"})
-public class Realizar1 extends HttpServlet {
+public class Realizar extends HttpServlet {
 
     public Conexion conex = new Conexion();
 
@@ -118,13 +119,13 @@ public class Realizar1 extends HttpServlet {
                 ave.setAnilla(resultado.getString("anilla"));
                 ave.setEspecie(resultado.getString("especie"));
                 ave.setLugar(resultado.getString("lugar"));
-                ave.setFecha(resultado.getString("fecha"));
+                ave.setFecha(resultado.getDate("fecha"));
                 listado.add(ave);
             }
             conex.cerrarConexion();
         } catch (SQLException ex) {
             System.out.println("Error SQL en el metodo visualizar");
-            Logger.getLogger(Realizar1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Realizar.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listado;
     }
